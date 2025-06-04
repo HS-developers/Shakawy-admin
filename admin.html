@@ -6,12 +6,12 @@
   <title>لوحة إدارة الشكاوى | KENZ Compound</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Cairo', sans-serif; background: linear-gradient(135deg, #1c0171 0%, #a6c1ee 100%); margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+    body { font-family: 'Cairo', sans-serif; background: linear-gradient(135deg, #1c0171 0%, #a6c1ee 100%); margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center;}
     header, main, footer { width: 95%; max-width: 1200px; margin: 20px auto; }
-    header { padding: 15px 30px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: space-between; border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
+    header { padding: 15px 30px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: space-between; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.10);}
     header img { height: 55px; object-fit: contain; transition: transform 0.3s ease; }
     header img:hover { transform: scale(1.08); }
-    header h1 { font-size: 32px; font-weight: bold; margin: 0; background: linear-gradient(90deg, #007bff, #00c6ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; padding-right: 20px; }
+    header h1 { font-size: 32px; font-weight: bold; margin: 0; background: linear-gradient(90deg, #007bff, #00c6ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; padding-right: 15px;}
     main { background: rgba(255, 255, 255, 0.95); border-radius: 15px; padding: 30px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); overflow-x: auto; }
     h2 { text-align: center; color: #343a40; margin-bottom: 20px; font-size: 28px; }
     table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-top: 20px; }
@@ -24,7 +24,7 @@
     button:hover { background-color: #218838; }
     .logout-btn { background-color: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
     .logout-btn:hover { background-color: #c82333; }
-    footer { padding: 15px; background: rgba(255, 255, 255, 0.9); text-align: center; font-size: 14px; color: #555; box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); border-top-left-radius: 15px; border-top-right-radius: 15px; margin-top: 30px; }
+    footer { padding: 15px; background: rgba(255, 255, 255, 0.9); text-align: center; font-size: 14px; color: #555; box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); border-top-left-radius: 15px; border-top-right-radius: 15px;}
     #detailsModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); align-items: center; justify-content: center; z-index: 9999; }
     #detailsModal > div { background: white; padding: 20px; border-radius: 10px; max-width: 500px; width: 90%; position: relative; text-align: center; }
 
@@ -62,6 +62,21 @@
 
     @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
     @keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
+
+    /* زر عرض الشكاوى المحلولة */
+    #toggleResolvedBtn {
+      background: #007bff;
+      color: white;
+      margin-left: 10px;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-size: 15px;
+      transition: background 0.3s;
+    }
+    #toggleResolvedBtn:hover {
+      background: #0056b3;
+    }
   </style>
 </head>
 
@@ -79,6 +94,7 @@
     <input type="text" id="searchInput" placeholder="🔎 ابحث عن شكوى...">
     <div id="complaintsCount" style="font-weight: bold; color: #f11212;">عدد الشكاوى: 0</div>
     <div id="welcomeMessage" style="font-size: 20px; color: #007bff;"></div>
+    <button onclick="toggleResolved()" id="toggleResolvedBtn">عرض الشكاوى المحلولة</button>
     <button onclick="logout()" class="logout-btn">تسجيل الخروج 🔒</button>
   </div>
 
@@ -151,6 +167,7 @@
   const complaintsCount = document.getElementById('complaintsCount');
   const searchInput = document.getElementById('searchInput');
   let complaintsData = [];
+  let showResolved = false;
 
   async function fetchComplaints() {
     const snapshot = await db.collection('complaints').orderBy('createdAt', 'desc').get();
@@ -160,10 +177,18 @@
 
   function renderComplaints(data) {
     complaintsTable.innerHTML = '';
-    complaintsCount.innerText = `عدد الشكاوى: ${data.length}`;
+    let filteredData = data;
+    // فلترة حسب العرض الحالي
+    if (!showResolved) {
+      filteredData = data.filter(c => c.status !== 'تم الحل' && c.status !== 'مغلق');
+    } else {
+      filteredData = data.filter(c => c.status === 'تم الحل' || c.status === 'مغلق');
+    }
+
+    complaintsCount.innerText = `عدد الشكاوى: ${filteredData.length}`;
     const now = new Date();
 
-    const sortedData = data.map(complaint => {
+    const sortedData = filteredData.map(complaint => {
       const createdAt = complaint.createdAt?.toDate?.() || new Date();
       const diffHours = (now - createdAt) / 36e5;
       return { ...complaint, isDelayed: diffHours >= 48 };
@@ -222,9 +247,23 @@
     document.getElementById('detailsModal').style.display = 'none';
   }
 
+  // زر التبديل بين الشكاوى المحلولة وغير المحلولة
+  function toggleResolved() {
+    showResolved = !showResolved;
+    document.getElementById('toggleResolvedBtn').textContent = showResolved ? "عودة لقائمة الشكاوى" : "عرض الشكاوى المحلولة";
+    renderComplaints(complaintsData);
+  }
+
+  // بحث آني
   searchInput.addEventListener('input', e => {
     const value = e.target.value.toLowerCase();
-    const filtered = complaintsData.filter(c =>
+    let filtered = complaintsData;
+    if (!showResolved) {
+      filtered = complaintsData.filter(c => c.status !== 'تم الحل' && c.status !== 'مغلق');
+    } else {
+      filtered = complaintsData.filter(c => c.status === 'تم الحل' || c.status === 'مغلق');
+    }
+    filtered = filtered.filter(c =>
       (c.name && c.name.toLowerCase().includes(value)) ||
       (c.unit && c.unit.toLowerCase().includes(value)) ||
       (c.phone && c.phone.includes(value))
