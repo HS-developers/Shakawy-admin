@@ -45,6 +45,19 @@
     button:hover { background-color: #218838; }
     .logout-btn { background-color: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
     .logout-btn:hover { background-color: #c82333; }
+    .complaint-date {
+      color: #007bff;
+      font-size: 15px;
+      margin-top: 7px;
+      margin-bottom: 0;
+      direction: rtl;
+      text-align: right;
+      font-weight: bold;
+      background: #e9f5ff;
+      border-radius: 7px;
+      padding: 3px 9px;
+      display: inline-block;
+    }
     footer {
       background: rgba(255, 255, 255, 0.9);
       text-align: center;
@@ -130,6 +143,10 @@
       .sub-title-center {
         font-size: 15px;
       }
+      .complaint-date {
+        font-size: 13px;
+        padding: 2px 6px;
+      }
     }
   </style>
 </head>
@@ -165,6 +182,7 @@
         <th>الهاتف</th>
         <th>عنوان الشكوى</th>
         <th>الحالة</th>
+        <th>تاريخ التسجيل</th>
         <th>حفظ التغيير</th>
       </tr>
     </thead>
@@ -230,6 +248,17 @@
   let complaintsData = [];
   let showResolved = false;
 
+  function formatDate(date) {
+    if (!date) return '';
+    return date.toLocaleString('ar-EG', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
   async function fetchComplaints() {
     const snapshot = await db.collection('complaints').orderBy('createdAt', 'desc').get();
     complaintsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -257,6 +286,13 @@
     sortedData.forEach(complaint => {
       const tr = document.createElement('tr');
       tr.className = complaint.isDelayed ? 'delayed' : '';
+      // تاريخ تسجيل الشكوى
+      let createdAtHtml = '';
+      if (complaint.createdAt && typeof complaint.createdAt.toDate === "function") {
+        createdAtHtml = `<span class="complaint-date">${formatDate(complaint.createdAt.toDate())}</span>`;
+      } else {
+        createdAtHtml = `<span class="complaint-date">غير متوفر</span>`;
+      }
       tr.innerHTML = `
         <td>${complaint.name || 'غير متوفر'} ${complaint.isDelayed ? '⚠️' : ''}</td>
         <td>${complaint.unit || 'غير متوفر'}</td>
@@ -266,6 +302,7 @@
           <button onclick="showDetails('${(complaint.description || 'لا توجد تفاصيل').replace(/'/g, "\\'").replace(/\n/g, '<br>')}')">عرض التفاصيل</button>
         </td>
         <td>${complaint.status || 'قيد المعالجة'}</td>
+        <td>${createdAtHtml}</td>
         <td>
           <select id="status-${complaint.id}">
             <option value="قيد المعالجة" ${complaint.status === 'قيد المعالجة' ? 'selected' : ''}>قيد المعالجة</option>
@@ -280,10 +317,14 @@
     });
   }
 
+  // التعديل المطلوب: حفظ تاريخ ووقت تحديث الحالة
   async function updateStatus(docId) {
     const newStatus = document.getElementById(`status-${docId}`).value;
     try {
-      await db.collection('complaints').doc(docId).update({ status: newStatus });
+      await db.collection('complaints').doc(docId).update({ 
+        status: newStatus,
+        statusUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
       showToast();
       fetchComplaints();
     } catch (error) {
