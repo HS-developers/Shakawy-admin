@@ -3,87 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تسجيل دخول الإدارة</title>
+  <title>لوحة إدارة الشكاوى | KENZ Compound</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* إعدادات عامة */
-body {
-  margin: 0;
-  font-family: 'Cairo', sans-serif;
-  background: #f0f2f5;
-  min-height: 100vh;
-}
-
-/* تنسيق الكونتينر الرئيسي */
-.container, .login-container {
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-/* الحقول والأزرار */
-input, button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 16px;
-}
-
-/* زر الخروج */
-button.logout-btn {
-  position: fixed;
-  top: 15px;
-  left: 15px;
-  background-color: #dc3545;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-/* ميديا كويري لشاشات أقل من 600 بيكسل */
-@media (max-width: 600px) {
-  .login-container, .container {
-    padding: 10px;
-    max-width: 90%;
-  }
-
-  input, button {
-    font-size: 18px;
-    padding: 14px;
-  }
-
-  button.logout-btn {
-    font-size: 14px;
-    padding: 8px 15px;
-  }
-}
-
-    body {
-      font-family: 'Cairo', sans-serif;
-      background: #f0f2f5;
-      height: 100vh;
-      margin: 0;
-      display: flex;
-      justify-content: center;
+    body { 
+      font-family: 'Cairo', sans-serif; 
+      background: linear-gradient(135deg, #1c0171 0%, #a6c1ee 100%); 
+      margin: 0; 
+      padding: 0; 
+      min-height: 100vh; 
+      display: flex; 
+      flex-direction: column; 
       align-items: center;
     }
-    .login-container {
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      width: 100%;
+    header, main, footer { 
+      width: 95%; 
+      max-width: 1200px; 
+      margin: 20px auto; 
+    }
+    header { 
+      background: rgba(255, 255, 255, 0.85); 
+      backdrop-filter: blur(8px); 
+      border-radius: 15px; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+      padding: 15px 30px 10px 30px;
+    }
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-row h1 {
+      font-size:32px; font-weight:bold; margin:0; background:linear-gradient(90deg,#007bff,#00c6ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; padding-right:15px;
+    }
+    .header-row img {
+      height:55px; object-fit:contain; transition:transform 0.3s;
+    }
+    .sub-title-center {
+      text-align:center; 
+      font-size:22px; 
+      color:#007bff; 
+      font-weight:bold; 
+      margin:15px 0 0 0;
+    }
+    main { 
+      background: rgba(255, 255, 255, 0.95); 
+      border-radius: 15px; 
+      padding: 30px; 
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); 
+      margin-top: 40px;
+      width: 95%;
       max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     h2 {
       text-align: center;
+      color: #343a40;
       margin-bottom: 20px;
-      color: #007bff;
+      font-size: 28px;
+    }
+    form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     input, button {
       width: 100%;
@@ -92,6 +77,7 @@ button.logout-btn {
       border-radius: 8px;
       border: 1px solid #ccc;
       font-size: 16px;
+      box-sizing: border-box;
     }
     button {
       background-color: #007bff;
@@ -99,6 +85,7 @@ button.logout-btn {
       font-weight: bold;
       transition: background 0.3s;
       cursor: pointer;
+      border: none;
     }
     button:hover {
       background-color: #0056b3;
@@ -107,59 +94,112 @@ button.logout-btn {
       color: red;
       text-align: center;
       margin-top: 10px;
+      font-size: 16px;
+    }
+    footer {
+      background: rgba(255, 255, 255, 0.9);
+      text-align: center;
+      font-size: 14px;
+      color: #555;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(5px);
+      border-top-left-radius: 15px;
+      border-top-right-radius: 15px;
+      margin-top: auto;
+      padding: 15px 0;
+    }
+    .footer-bar {
+      display: inline-block;
+      background: inherit;
+      padding: 8px 26px;
+      border-radius: 10px;
+      box-shadow: inherit;
+    }
+    @media (max-width: 600px) {
+      header, main, footer {
+        padding: 10px;
+        max-width: 98%;
+      }
+      main {
+        padding: 16px;
+      }
+      input, button {
+        font-size: 18px;
+        padding: 14px;
+      }
+      .header-row h1 {
+        font-size: 22px;
+        padding-right: 7px;
+      }
+      .sub-title-center {
+        font-size: 15px;
+      }
     }
   </style>
 </head>
 <body>
+  <header>
+    <div class="header-row">
+      <h1>KENZ Compound</h1>
+      <img src="11.jpg" alt="شعار KENZ">
+    </div>
+    <div class="sub-title-center">
+      نظام إدارة الشكاوى
+    </div>
+  </header>
 
-<div class="login-container">
-  <h2>🔒 دخول المشرف</h2>
-  <form id="loginForm">
-    <input type="email" id="email" placeholder="البريد الإلكتروني" required>
-    <input type="password" id="password" placeholder="كلمة المرور" required>
-    <button type="submit">تسجيل الدخول</button>
-    <div class="error" id="errorMsg"></div>
-  </form>
-</div>
+  <main>
+    <h2>🔒 دخول المشرف</h2>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="البريد الإلكتروني" required>
+      <input type="password" id="password" placeholder="كلمة المرور" required>
+      <button type="submit">تسجيل الدخول</button>
+      <div class="error" id="errorMsg"></div>
+    </form>
+  </main>
 
-<!-- Firebase Libraries -->
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <footer>
+    <div class="footer-bar">
+      Copyright © 2025 GENIUS Tech Co. All Rights Reserved
+    </div>
+  </footer>
 
-<script>
-  // إعداد Firebase
-  const firebaseConfig = {
-  apiKey: "AIzaSyCqLIInr3ygfUcQVauAjtZsB-WIWBnBNBg",
-  authDomain: "shakawy-e906e.firebaseapp.com",
-  databaseURL: "https://shakawy-e906e-default-rtdb.firebaseio.com",
-  projectId: "shakawy-e906e",
-  storageBucket: "shakawy-e906e.firebasestorage.app",
-  messagingSenderId: "912635139012",
-  appId: "1:912635139012:web:f5580cca52b0bf02e34a91",
-  measurementId: "G-C5YPWCVDBK"
-};
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
+  <script>
+    // إعداد Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCqLIInr3ygfUcQVauAjtZsB-WIWBnBNBg",
+      authDomain: "shakawy-e906e.firebaseapp.com",
+      databaseURL: "https://shakawy-e906e-default-rtdb.firebaseio.com",
+      projectId: "shakawy-e906e",
+      storageBucket: "shakawy-e906e.appspot.com",
+      messagingSenderId: "912635139012",
+      appId: "1:912635139012:web:f5580cca52b0bf02e34a91",
+      measurementId: "G-C5YPWCVDBK"
+    };
 
-  const loginForm = document.getElementById('loginForm');
-  const errorMsg = document.getElementById('errorMsg');
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
 
-  loginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
+    const loginForm = document.getElementById('loginForm');
+    const errorMsg = document.getElementById('errorMsg');
 
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
 
-    auth.signInWithEmailAndPassword(email, password)
-      .then(() => {
-        window.location.href = "admin.html"; // دخول ناجح => يحوله على لوحة الإدارة
-      })
-      .catch((error) => {
-        errorMsg.textContent = "❌ البريد أو كلمة المرور غير صحيحة!";
-      });
-  });
-</script>
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
 
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+          window.location.href = "admin.html";
+        })
+        .catch((error) => {
+          errorMsg.textContent = "❌ البريد أو كلمة المرور غير صحيحة!";
+        });
+    });
+  </script>
 </body>
 </html>
